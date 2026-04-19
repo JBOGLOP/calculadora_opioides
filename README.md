@@ -2,7 +2,7 @@
 
 Dos herramientas web gratuitas para estudiantes y profesionales de la salud, pensadas para el contexto colombiano.
 
-**Autor:** Dr. Jorge Bogoya · Maestría en Cuidados Paliativos · Universidad Antonio Nariño 🇨🇴
+**Autor:** Dr. Jorge Bogoya · Docente Maestría en Cuidados Paliativos · Universidad Antonio Nariño 🇨🇴
 
 ---
 

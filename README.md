@@ -15,10 +15,6 @@ Puedes usar las herramientas directamente desde tu navegador, sin instalar nada:
 | 📊 **Calculadoras Pronósticas y Clase Interactiva** | [Abrir Pronosticos_CP.html](./Pronosticos_CP.html) |
 | 💊 **Calculadora de Equianalgesia Opioide (DEMO)** | [Abrir Calculadora_Opioides.html](./Calculadora_Opioides.html) |
 
-> 💡 **Si el repositorio tiene GitHub Pages activado**, las herramientas se abren directamente desde:
-> - `https://<tu-usuario>.github.io/<nombre-repo>/Pronosticos_CP.html`
-> - `https://<tu-usuario>.github.io/<nombre-repo>/Calculadora_Opioides.html`
-
 ---
 
 ## 📊 ¿Qué incluye cada herramienta?

@@ -14,12 +14,13 @@
 Este repositorio reúne dos herramientas web interactivas desarrolladas como material docente para la **Maestría en Cuidados Paliativos de la Universidad Antonio Nariño (Colombia)**. Están diseñadas como recursos de apoyo académico y clínico para estudiantes, profesionales de atención primaria y especialistas en cuidados paliativos.
 
 Ambas son aplicaciones **estáticas de un solo archivo HTML** (sin dependencias de servidor), listas para abrirse localmente, desplegarse en GitHub Pages o integrarse en aulas virtuales.
-
+**Archivo:** `Clase2_Interactiva_Salud_CP.html`
+**Archivo:** `Calculadora_Equianalgesia_Opioide.html`
 ---
 
 ## 🧰 Herramientas incluidas
 
-### 1️⃣ Clase 2 — Factores pronósticos y cuidado al final de la vida
+### 1️⃣  Factores pronósticos y cuidado al final de la vida
 
 Clase interactiva sincrónica que aborda los temas 1.3 y 1.4 del programa curricular, con calculadoras pronósticas integradas en tiempo real.
 

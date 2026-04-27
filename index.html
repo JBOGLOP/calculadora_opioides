@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6C63B7">
+<title>Registro Paliativo · Dolor y Cuidados Paliativos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&family=Source+Serif+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#6C63B7; --primary-deep:#4A4590;
+  --accent-blue:#5B8DB8; --accent-sage:#7FA88D; --accent-rose:#B8839D; --accent-sand:#C9A370;
+  --bg:#FAF8F3; --surface:#FFFFFF;
+  --ink:#2A2A2A; --ink-soft:#4A4A4A; --mute:#888; --border:#E8E3D9;
+  --danger-bg:#FCEBEB; --danger-text:#A32D2D;
+  --success-bg:#EAF3DE; --success-text:#3B6D11;
+  --warning-bg:#FAEEDA; --warning-text:#854F0B;
+  --info-bg:#E6F1FB; --info-text:#0C447C;
+  --font-sans:'Inter',system-ui,sans-serif;
+  --font-serif:'Source Serif Pro',Georgia,serif;
+  --font-display:'Cormorant Garamond',serif;
+  --radius-sm:6px; --radius-md:8px; --radius-lg:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(74,69,144,.06);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);line-height:1.55;-webkit-text-size-adjust:100%}
+.app{max-width:920px;margin:0 auto;padding:18px 16px 100px;min-height:100vh}
+
+/* Header */
+.hdr{margin-bottom:18px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);font-weight:600;margin-bottom:6px}
+.hdr h1{font-family:var(--font-display);font-size:30px;font-weight:500;margin:0 0 4px;line-height:1.15;color:var(--primary-deep)}
+.hdr .sub{font-family:var(--font-serif);font-size:14px;color:var(--ink-soft);font-style:italic;margin:0}
+
+/* Estado de conexión */
+.status{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mute);margin-top:8px;padding:3px 10px;background:var(--surface);border:1px solid var(--border);border-radius:99px}
+.status .dot{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+.status.online .dot{background:#4CAF50}
+.status.error .dot{background:#E25555}
+
+/* Stepper */
+.stepper{display:flex;gap:6px;margin:14px 0 18px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.step{flex:1;min-width:0;padding:10px 8px;text-align:center;border-radius:var(--radius-md);font-size:11.5px;font-weight:500;background:var(--surface);border:1px solid var(--border);color:var(--mute);white-space:nowrap;transition:all .2s}
+.step.active{background:rgba(108,99,183,.1);color:var(--primary-deep);border-color:var(--primary)}
+.step.done{background:rgba(127,168,141,.12);color:var(--accent-sage);border-color:var(--accent-sage)}
+.step .step-num{display:inline-block;width:18px;height:18px;line-height:18px;border-radius:50%;background:var(--border);color:var(--surface);font-size:10px;margin-right:5px;font-weight:600}
+.step.active .step-num{background:var(--primary);color:#fff}
+.step.done .step-num{background:var(--accent-sage);color:#fff}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-head{padding:18px 20px 12px;border-bottom:1px solid var(--border);background:rgba(108,99,183,.03)}
+.card-head h2{font-family:var(--font-display);font-size:22px;font-weight:500;margin:0 0 4px;color:var(--primary-deep)}
+.card-head .desc{font-family:var(--font-serif);font-size:13px;color:var(--ink-soft);font-style:italic;margin:0}
+.card-body{padding:18px 20px}
+.card-foot{padding:14px 20px;border-top:1px solid var(--border);background:rgba(0,0,0,.015);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Tarjeta del paciente fija */
+.pac-card{background:linear-gradient(135deg,rgba(108,99,183,.08),rgba(91,141,184,.05));border:1px solid var(--primary);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:16px;display:none}
+.pac-card.show{display:block}
+.pac-card .pac-name{font-family:var(--font-display);font-size:20px;color:var(--primary-deep);font-weight:500;line-height:1.2;margin:0 0 4px}
+.pac-card .pac-meta{font-size:12px;color:var(--ink-soft);display:flex;gap:14px;flex-wrap:wrap}
+.pac-card .pac-meta strong{color:var(--primary-deep);font-weight:600}
+
+/* Resumen de evaluaciones previas */
+.prev{margin-top:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px}
+.prev-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--primary);font-weight:600;margin-bottom:6px}
+.prev-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:3px;color:var(--ink-soft)}
+.prev .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600}
+.prev .b-pos{background:var(--danger-bg);color:var(--danger-text)}
+.prev .b-neg{background:var(--success-bg);color:var(--success-text)}
+.prev .b-mid{background:var(--warning-bg);color:var(--warning-text)}
+.prev a.history-link{color:var(--primary);text-decoration:none;font-weight:500;font-size:11.5px;cursor:pointer;border-bottom:1px dotted var(--primary)}
+.prev a.history-link:hover{color:var(--primary-deep)}
+
+/* Inputs */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.field input, .field select, .field textarea{
+  width:100%;padding:11px 12px;font-family:inherit;font-size:15px;color:var(--ink);
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  transition:border-color .15s, box-shadow .15s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,99,183,.15)
+}
+.field textarea{resize:vertical;min-height:60px;line-height:1.5}
+.field .hint{font-size:11.5px;color:var(--mute);margin-top:4px;font-style:italic}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.field-row{grid-template-columns:1fr}}
+
+/* Buttons */
+.btn{
+  padding:11px 20px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+  border-radius:var(--radius-md);border:1px solid transparent;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  min-height:44px;
+}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover:not(:disabled){background:var(--primary-deep);border-color:var(--primary-deep)}
+.btn-secondary{background:var(--surface);color:var(--ink-soft);border-color:var(--border)}
+.btn-secondary:hover:not(:disabled){border-color:var(--primary);color:var(--primary-deep)}
+.btn-ghost{background:transparent;color:var(--mute);border-color:transparent;padding:8px 12px;font-size:12.5px}
+.btn-ghost:hover{color:var(--primary)}
+
+/* NECPAL items */
+.necpal-section{font-size:10.5px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:.12em;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px dashed rgba(108,99,183,.25)}
+.necpal-section:first-child{margin-top:4px}
+.necpal-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(232,227,217,.6)}
+.necpal-item:last-child{border-bottom:none}
+.necpal-text{flex:1;font-size:14px;line-height:1.5;color:var(--ink)}
+.necpal-buttons{display:flex;gap:6px;flex-shrink:0}
+.btn-opt{
+  padding:7px 14px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);
+  color:var(--ink-soft);min-width:48px;min-height:36px;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.btn-opt:hover{border-color:var(--primary)}
+.btn-opt.sel-yes{background:var(--danger-bg);color:var(--danger-text);border-color:#E2B5B5}
+.btn-opt.sel-no{background:var(--success-bg);color:var(--success-text);border-color:#B9D692}
+
+/* NECPAL result */
+.necpal-result{padding:16px 20px;background:linear-gradient(135deg,rgba(108,99,183,.06),rgba(91,141,184,.04));border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.result-num{font-family:var(--font-display);font-size:24px;font-weight:500;color:var(--primary-deep);line-height:1.1}
+.result-label{font-size:12px;color:var(--ink-soft);margin-top:4px}
+.result-verdict{font-size:13px;padding:8px 14px;border-radius:var(--radius-md);font-weight:600;white-space:nowrap}
+.v-pos{background:var(--danger-bg);color:var(--danger-text)}
+.v-neg{background:var(--success-bg);color:var(--success-text)}
+.v-mid{background:var(--warning-bg);color:var(--warning-text)}
+.v-info{background:var(--info-bg);color:var(--info-text)}
+
+/* ESAS */
+.esas-item{padding:12px 0;border-bottom:1px solid rgba(232,227,217,.5)}
+.esas-item:last-child{border-bottom:none}
+.esas-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px;flex-wrap:wrap}
+.esas-name{font-size:14px;font-weight:600;color:var(--ink)}
+.esas-anchors{font-size:11px;color:var(--mute);font-style:italic;flex:1;text-align:right;min-width:140px}
+.esas-value{font-family:var(--font-display);font-size:24px;font-weight:500;color:var(--primary-deep);min-width:36px;text-align:center}
+.esas-value.severe{color:var(--danger-text)}
+.esas-value.moderate{color:var(--warning-text)}
+.esas-value.mild{color:var(--accent-sage)}
+.esas-slider{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:6px;border-radius:99px;outline:none;
+  background:linear-gradient(to right,
+    var(--accent-sage) 0%, var(--accent-sage) 30%,
+    var(--accent-sand) 30%, var(--accent-sand) 70%,
+    var(--accent-rose) 70%, var(--accent-rose) 100%);
+}
+.esas-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:24px;height:24px;border-radius:50%;background:var(--surface);
+  border:2px solid var(--primary);cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.esas-slider::-moz-range-thumb{
+  width:24px;height:24px;border-radius:50%;background:var(--surface);
+  border:2px solid var(--primary);cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.esas-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:3px;padding:0 2px}
+.esas-totals{padding:14px 20px;background:rgba(108,99,183,.04);border-top:1px solid var(--border);display:flex;gap:18px;flex-wrap:wrap;justify-content:space-around}
+.esas-total-item{text-align:center}
+.esas-total-num{font-family:var(--font-display);font-size:26px;font-weight:500;color:var(--primary-deep);line-height:1}
+.esas-total-lbl{font-size:11px;color:var(--ink-soft);margin-top:3px;text-transform:uppercase;letter-spacing:.05em}
+
+/* Toast / alert */
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,150%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:var(--radius-md);font-size:13px;z-index:1000;transition:transform .25s ease;max-width:90%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translate(-50%,0)}
+.toast.error{background:var(--danger-text)}
+.toast.success{background:var(--success-text)}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(42,42,42,.5);display:none;align-items:center;justify-content:center;z-index:900;padding:16px;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius-lg);max-width:560px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-family:var(--font-display);font-size:20px;color:var(--primary-deep);margin:0;font-weight:500}
+.modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;color:var(--mute);width:32px;height:32px;border-radius:50%}
+.modal-close:hover{background:var(--bg);color:var(--ink)}
+.modal-body{padding:16px 20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.history-item{padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px;font-size:13px}
+.history-item .h-date{font-weight:600;color:var(--primary-deep);font-size:12px;margin-bottom:6px}
+.history-item .h-row{display:flex;gap:10px;margin:3px 0;flex-wrap:wrap;color:var(--ink-soft)}
+.history-item .h-row strong{color:var(--ink)}
+
+/* Loader */
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Footer credit */
+.credit{text-align:center;font-size:11px;color:var(--mute);font-style:italic;margin-top:30px;padding:0 16px;line-height:1.5}
+.credit strong{color:var(--ink-soft);font-style:normal}
+
+/* Hidden helper */
+.hidden{display:none !important}
+
+/* Lock screen */
+.lock-screen{
+  position:fixed; inset:0; z-index:2000;
+  background:linear-gradient(135deg, #FAF8F3 0%, #F0EDE5 100%);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px; -webkit-overflow-scrolling:touch;
+}
+.lock-card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-lg); box-shadow:0 8px 30px rgba(74,69,144,.12);
+  max-width:420px; width:100%; padding:36px 28px 28px; text-align:center;
+}
+.lock-icon{
+  width:56px; height:56px; margin:0 auto 18px;
+  border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--accent-blue));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:24px;
+}
+.lock-card h1{
+  font-family:var(--font-display); font-size:26px; font-weight:500;
+  color:var(--primary-deep); margin:0 0 6px; line-height:1.2;
+}
+.lock-card .lock-sub{
+  font-family:var(--font-serif); font-size:13px; color:var(--ink-soft);
+  font-style:italic; margin:0 0 22px; line-height:1.5;
+}
+.lock-card .lock-input{
+  width:100%; padding:13px 14px; font-family:inherit; font-size:15px;
+  border:1.5px solid var(--border); border-radius:var(--radius-md);
+  background:var(--bg); color:var(--ink); margin-bottom:12px;
+  -webkit-appearance:none; appearance:none; transition:border-color .15s, box-shadow .15s;
+}
+.lock-card .lock-input:focus{
+  outline:none; border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(108,99,183,.15); background:var(--surface);
+}
+.lock-card .lock-input.shake{
+  animation:shake .4s; border-color:var(--danger-text);
+  background:var(--danger-bg);
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%,60%{transform:translateX(-6px)}
+  40%,80%{transform:translateX(6px)}
+}
+.lock-card .lock-msg{
+  font-size:12px; min-height:18px; margin:0 0 14px;
+  color:var(--mute); line-height:1.4;
+}
+.lock-card .lock-msg.error{color:var(--danger-text)}
+.lock-card .lock-msg.locked{color:var(--danger-text); font-weight:600}
+.lock-card .lock-btn{
+  width:100%; padding:13px; font-family:inherit; font-size:14px; font-weight:600;
+  background:var(--primary); color:#fff; border:0; border-radius:var(--radius-md);
+  cursor:pointer; transition:background .15s; min-height:48px;
+  -webkit-tap-highlight-color:transparent;
+}
+.lock-card .lock-btn:hover:not(:disabled){background:var(--primary-deep)}
+.lock-card .lock-btn:disabled{opacity:.5; cursor:not-allowed}
+.lock-card .lock-foot{
+  margin-top:20px; padding-top:16px; border-top:1px solid var(--border);
+  font-size:11px; color:var(--mute); font-style:italic; line-height:1.5;
+}
+.lock-card .lock-foot strong{color:var(--ink-soft); font-style:normal}
+
+/* Responsive */
+@media (min-width:768px){
+  .app{padding:24px 24px 100px}
+  .hdr h1{font-size:36px}
+  .stepper{gap:8px}
+  .step{font-size:13px;padding:12px 14px}
+}
+@media (min-width:1024px){
+  .app{padding:32px 32px 100px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- PANTALLA DE BLOQUEO                                            -->
+<!-- ============================================================ -->
+<div id="lockScreen" class="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h1>Acceso restringido</h1>
+    <p class="lock-sub">Esta herramienta gestiona datos clínicos sensibles.<br>Ingrese la clave de acceso para continuar.</p>
+    <input type="password" id="lockInput" class="lock-input" placeholder="Clave de acceso" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <div id="lockMsg" class="lock-msg">&nbsp;</div>
+    <button id="lockBtn" class="lock-btn">Ingresar</button>
+    <div class="lock-foot">
+      <strong>Sistema de Registro Paliativo</strong><br>
+      Dr. Jorge Bogoya · Universidad Antonio Nariño 🇨🇴
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appContainer" style="display:none">
+
+<!-- Header -->
+<header class="hdr">
+  <div class="eyebrow">Servicio de Dolor y Cuidados Paliativos</div>
+  <h1>Registro y Seguimiento Paliativo</h1>
+  <p class="sub">Identificación, cribado y evaluación sintomática integrada</p>
+  <span id="status" class="status"><span class="dot"></span><span id="status-txt">Conectando…</span></span>
+</header>
+
+<!-- Tarjeta del paciente (visible tras cargar) -->
+<div id="pacCard" class="pac-card">
+  <div class="pac-name" id="pacName">—</div>
+  <div class="pac-meta" id="pacMeta"></div>
+  <div id="prevBox"></div>
+</div>
+
+<!-- Stepper -->
+<div class="stepper" id="stepper">
+  <div class="step active" data-step="1"><span class="step-num">1</span>Identificación</div>
+  <div class="step" data-step="2"><span class="step-num">2</span>NECPAL 4.0</div>
+  <div class="step" data-step="3"><span class="step-num">3</span>ESAS-r</div>
+  <div class="step" data-step="4"><span class="step-num">4</span>Resumen</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PASO 1: IDENTIFICACIÓN                                       -->
+<!-- ============================================================ -->
+<section id="step-1" class="step-panel">
+  <div class="card">
+    <div class="card-head">
+      <h2>Identificación del paciente</h2>
+      <p class="desc">Búsqueda por documento. Si no existe, se crea un registro nuevo.</p>
+    </div>
+    <div class="card-body">
+
+      <div class="field">
+        <label for="evaluador">Evaluador</label>
+        <select id="evaluador">
+          <option value="auto-registro">Auto-registro (paciente)</option>
+          <option value="médico">Médico</option>
+          <option value="enfermera">Enfermera</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="docInput">Documento de identidad</label>
+        <input type="tel" id="docInput" inputmode="numeric" autocomplete="off" placeholder="Ingrese el número del documento">
+        <div class="hint">Solo dígitos. Pulse Buscar para verificar si está registrado.</div>
+      </div>
+
+      <button id="btnBuscar" class="btn btn-primary" style="width:100%">Buscar paciente</button>
+
+      <!-- Formulario de registro nuevo (oculto inicial) -->
+      <div id="formNuevo" class="hidden" style="margin-top:16px">
+        <div class="necpal-section" id="formTitle">Nuevo registro</div>
+
+        <div class="field">
+          <label for="nombre">Nombre y apellidos</label>
+          <input type="text" id="nombre" autocomplete="off" placeholder="Nombre completo del paciente">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="edad">Edad</label>
+            <input type="number" id="edad" min="0" max="120" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="sexo">Sexo</label>
+            <select id="sexo">
+              <option value="">—</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dxPrincipal">Diagnóstico principal</label>
+          <input type="text" id="dxPrincipal" placeholder="p. ej., Cáncer de mama metastásico, EPOC GOLD IV…">
+        </div>
+
+        <div class="field">
+          <label for="dxSecundario">Diagnóstico secundario</label>
+          <input type="text" id="dxSecundario" placeholder="p. ej., HTA, DM2, ICC NYHA III…">
+        </div>
+
+        <button id="btnGuardarPac" class="btn btn-primary" style="width:100%">Guardar y continuar</button>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-ghost" id="btnReiniciar">Limpiar formulario</button>
+      <button class="btn btn-secondary" id="btnIrNECPAL" disabled>Continuar a NECPAL →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PASO 2: NECPAL                                               -->
+<!-- ============================================================ -->
+<section id="step-2" class="step-panel hidden">
+  <div class="card">
+    <div class="card-head">
+      <h2>NECPAL CCOMS-ICO 4.0</h2>
+      <p class="desc">Pregunta sorpresa + 10 parámetros adicionales · Positivo si SQ = No + ≥1 parámetro positivo.</p>
+    </div>
+    <div class="card-body" id="necpalBody"></div>
+    <div class="necpal-result">
+      <div>
+        <div class="result-num" id="necpalNum">SQ: — · Parámetros: 0</div>
+        <div class="result-label">Positivo si SQ = No + al menos 1 parámetro adicional</div>
+      </div>
+      <div class="result-verdict v-info" id="necpalVerdict" style="display:none"></div>
+    </div>
+    <div class="card-body" style="border-top:1px solid var(--border)">
+      <div class="field">
+        <label for="necpalObs">Observaciones (opcional)</label>
+        <textarea id="necpalObs" placeholder="Notas clínicas relevantes para esta evaluación NECPAL…"></textarea>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-secondary" data-back="1">← Volver</button>
+      <button class="btn btn-primary" id="btnIrESAS">Continuar a ESAS →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PASO 3: ESAS-r                                                -->
+<!-- ============================================================ -->
+<section id="step-3" class="step-panel hidden">
+  <div class="card">
+    <div class="card-head">
+      <h2>ESAS-r · Edmonton Symptom Assessment System (revisado)</h2>
+      <p class="desc">Intensidad de cada síntoma en las últimas 24 horas. Escala 0 (ausente) a 10 (peor posible).</p>
+    </div>
+    <div class="card-body" id="esasBody"></div>
+    <div class="esas-totals">
+      <div class="esas-total-item"><div class="esas-total-num" id="esasTotal">0</div><div class="esas-total-lbl">Carga total</div></div>
+      <div class="esas-total-item"><div class="esas-total-num" id="esasProm">0.0</div><div class="esas-total-lbl">Promedio</div></div>
+      <div class="esas-total-item"><div class="esas-total-num" id="esasSev">0</div><div class="esas-total-lbl">Síntomas ≥ 7</div></div>
+    </div>
+    <div class="card-body" style="border-top:1px solid var(--border)">
+      <div class="field">
+        <label for="esasObs">Observaciones (opcional)</label>
+        <textarea id="esasObs" placeholder="Notas clínicas, contexto, intervenciones planeadas…"></textarea>
+      </div>
+    </div>
+    <div class="card-foot">
+      <button class="btn btn-secondary" data-back="2">← Volver</button>
+      <button class="btn btn-primary" id="btnGuardarVisita">Guardar evaluación completa</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PASO 4: RESUMEN                                              -->
+<!-- ============================================================ -->
+<section id="step-4" class="step-panel hidden">
+  <div class="card">
+    <div class="card-head">
+      <h2>Evaluación guardada</h2>
+      <p class="desc">Los datos quedaron registrados en la base de datos.</p>
+    </div>
+    <div class="card-body" id="summaryBody"></div>
+    <div class="card-foot">
+      <button class="btn btn-ghost" id="btnHistorial">Ver historial completo</button>
+      <button class="btn btn-primary" id="btnNueva">Iniciar nueva evaluación</button>
+    </div>
+  </div>
+</section>
+
+<!-- Modal historial -->
+<div class="modal-bg" id="modalHist">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Historial del paciente</h3>
+      <button class="modal-close" onclick="cerrarModal()">×</button>
+    </div>
+    <div class="modal-body" id="histBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Footer -->
+<div class="credit">
+  Elaborado por <strong>Jorge Bogoya López</strong>, docente de la Maestría en Investigación en Cuidados Paliativos<br>
+  Universidad Antonio Nariño · Colombia 🇨🇴
+</div>
+
+</div><!-- /app -->
+
+<script>
+/* ============================================================ *
+ *  SISTEMA DE BLOQUEO POR CLAVE                                  *
+ *  Hash SHA-256 calculado en navegador con Web Crypto API        *
+ * ============================================================ */
+const ACCESS_HASH = '95152cef05aa9d54b9fa7096513aac9c55e06fc0e81f4ef5d35d97f61062ce4e';
+const MAX_ATTEMPTS = 5;       // intentos antes de bloqueo
+const LOCKOUT_MINUTES = 15;   // duración del bloqueo
+const LS_KEY_ATTEMPTS = 'paliativo_lock_attempts';
+const LS_KEY_LOCKED   = 'paliativo_lock_until';
+
+async function sha256(text){
+  const buf = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function getLockoutTime(){
+  const v = localStorage.getItem(LS_KEY_LOCKED);
+  if (!v) return 0;
+  const until = parseInt(v, 10);
+  if (isNaN(until) || until <= Date.now()){
+    localStorage.removeItem(LS_KEY_LOCKED);
+    localStorage.removeItem(LS_KEY_ATTEMPTS);
+    return 0;
+  }
+  return until;
+}
+
+function getAttempts(){
+  const v = parseInt(localStorage.getItem(LS_KEY_ATTEMPTS) || '0', 10);
+  return isNaN(v) ? 0 : v;
+}
+
+function setAttempts(n){
+  localStorage.setItem(LS_KEY_ATTEMPTS, String(n));
+}
+
+function lockoutNow(){
+  const until = Date.now() + LOCKOUT_MINUTES * 60 * 1000;
+  localStorage.setItem(LS_KEY_LOCKED, String(until));
+}
+
+function fmtRemaining(ms){
+  const total = Math.ceil(ms / 1000);
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  if (m > 0) return `${m} min ${s.toString().padStart(2,'0')} s`;
+  return `${s} s`;
+}
+
+function showLockMessage(msg, type){
+  const el = document.getElementById('lockMsg');
+  el.textContent = msg || '\u00a0';
+  el.className = 'lock-msg' + (type ? ' ' + type : '');
+}
+
+let lockoutInterval = null;
+
+function startLockoutCountdown(until){
+  const input = document.getElementById('lockInput');
+  const btn = document.getElementById('lockBtn');
+  input.disabled = true;
+  btn.disabled = true;
+  if (lockoutInterval) clearInterval(lockoutInterval);
+
+  function tick(){
+    const remaining = until - Date.now();
+    if (remaining <= 0){
+      clearInterval(lockoutInterval);
+      lockoutInterval = null;
+      localStorage.removeItem(LS_KEY_LOCKED);
+      localStorage.removeItem(LS_KEY_ATTEMPTS);
+      input.disabled = false;
+      btn.disabled = false;
+      showLockMessage('Puede intentar nuevamente.', '');
+      input.focus();
+    } else {
+      showLockMessage(`Bloqueado por ${MAX_ATTEMPTS} intentos fallidos. Reintente en ${fmtRemaining(remaining)}.`, 'locked');
+    }
+  }
+  tick();
+  lockoutInterval = setInterval(tick, 1000);
+}
+
+async function tryUnlock(){
+  const input = document.getElementById('lockInput');
+  const btn = document.getElementById('lockBtn');
+  const value = input.value;
+  if (!value){
+    showLockMessage('Ingrese la clave.', 'error');
+    return;
+  }
+
+  // ¿bloqueado?
+  const lockedUntil = getLockoutTime();
+  if (lockedUntil){
+    startLockoutCountdown(lockedUntil);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Verificando…';
+  try {
+    const hash = await sha256(value);
+    if (hash === ACCESS_HASH){
+      // éxito: limpiar contadores y mostrar app
+      localStorage.removeItem(LS_KEY_ATTEMPTS);
+      localStorage.removeItem(LS_KEY_LOCKED);
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('appContainer').style.display = '';
+      // limpiar input por si se queda en historial
+      input.value = '';
+      // arrancar el resto de la app
+      checkConnection();
+      return;
+    }
+    // fallo
+    const attempts = getAttempts() + 1;
+    setAttempts(attempts);
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 400);
+    if (attempts >= MAX_ATTEMPTS){
+      lockoutNow();
+      startLockoutCountdown(getLockoutTime());
+    } else {
+      const restantes = MAX_ATTEMPTS - attempts;
+      showLockMessage(`Clave incorrecta. Intentos restantes: ${restantes}.`, 'error');
+      input.value = '';
+      input.focus();
+    }
+  } catch(err){
+    showLockMessage('Error al verificar: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Ingresar';
+  }
+}
+
+// Listeners de la pantalla de bloqueo
+document.getElementById('lockBtn').addEventListener('click', tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+// Comprobar al cargar si hay bloqueo activo
+(function initLockScreen(){
+  const lockedUntil = getLockoutTime();
+  if (lockedUntil){
+    startLockoutCountdown(lockedUntil);
+  } else {
+    document.getElementById('lockInput').focus();
+  }
+})();
+
+/* ============================================================ *
+ *  CONFIGURACIÓN — URL del Apps Script desplegado                *
+ * ============================================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbwgjHjdJ0lkAcw680xqOo4gW8tVWTTm4Ctr-QsR1mYeS6wx9diV6QPnVqLrLfacSyAX/exec';
+
+/* ============================================================ *
+ *  ESTRUCTURAS DE DATOS                                          *
+ * ============================================================ */
+const NECPAL_ITEMS = [
+  {section:'Pregunta sorpresa (requerida)'},
+  {id:'sq',  text:'¿Le sorprendería a usted que este paciente muriera en los próximos 12 meses?', invert:true},
+  {section:'Parámetros adicionales'},
+  {id:'p1',  text:'Demanda explícita del paciente, familia o cuidador de cuidado paliativo'},
+  {id:'p2',  text:'Marcadores nutricionales: pérdida ponderal >10%, albúmina <2,5 g/dL o desnutrición severa'},
+  {id:'p3',  text:'Marcadores funcionales: Karnofsky <50% o Barthel <60 con declive progresivo'},
+  {id:'p4',  text:'Marcadores de dependencia: necesidad de ayuda para AVD o pérdida de autonomía'},
+  {id:'p5',  text:'Marcadores emocionales: distrés severo, depresión clínica o impacto emocional significativo'},
+  {id:'p6',  text:'Marcadores geriátricos: síndromes geriátricos complejos, deterioro cognitivo avanzado'},
+  {id:'p7',  text:'Marcadores sociales: vulnerabilidad social, aislamiento o claudicación del cuidador'},
+  {id:'p8',  text:'Uso de recursos: ≥2 ingresos urgentes en 6 meses o demanda intensiva de atención'},
+  {id:'p9',  text:'Multimorbilidad: ≥2 enfermedades crónicas concurrentes avanzadas'},
+  {id:'p10', text:'Indicador específico de enfermedad (cáncer, EPOC, IC, demencia, neurológica, hepática, renal, VIH)'}
+];
+
+const ESAS_ITEMS = [
+  {id:'dolor',      label:'Dolor',                anchors:'Sin dolor → Peor dolor posible'},
+  {id:'cansancio',  label:'Cansancio',            anchors:'Sin cansancio → Peor cansancio posible'},
+  {id:'somnolencia',label:'Somnolencia',          anchors:'Sin somnolencia → Peor somnolencia posible'},
+  {id:'nauseas',    label:'Náuseas',              anchors:'Sin náuseas → Peores náuseas posibles'},
+  {id:'apetito',    label:'Falta de apetito',     anchors:'Mejor apetito → Peor apetito posible'},
+  {id:'disnea',     label:'Falta de aire',        anchors:'Sin falta de aire → Peor falta de aire posible'},
+  {id:'depresion',  label:'Depresión',            anchors:'Sin depresión → Peor depresión posible'},
+  {id:'ansiedad',   label:'Ansiedad',             anchors:'Sin ansiedad → Peor ansiedad posible'},
+  {id:'bienestar',  label:'Sensación de bienestar',anchors:'Mejor bienestar → Peor bienestar posible'}
+];
+
+/* ============================================================ *
+ *  ESTADO                                                        *
+ * ============================================================ */
+const state = {
+  evaluador:'auto-registro',
+  paciente:null,
+  necpal:{},
+  esas:{},
+  ultimaVisita:null
+};
+
+/* ============================================================ *
+ *  API                                                           *
+ * ============================================================ */
+async function api(action, payload = {}) {
+  if (!API_URL || API_URL.startsWith('PEGAR')) {
+    throw new Error('Configure la constante API_URL con la URL del Apps Script desplegado.');
+  }
+  const body = JSON.stringify(Object.assign({action}, payload));
+  // Apps Script Web Apps require text/plain to avoid CORS preflight
+  const res = await fetch(API_URL, {
+    method:'POST',
+    body,
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    redirect:'follow'
+  });
+  if (!res.ok) throw new Error('Error de red: ' + res.status);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'Error desconocido');
+  return json.data;
+}
+
+async function checkConnection(){
+  const s = document.getElementById('status');
+  const t = document.getElementById('status-txt');
+  try{
+    if (!API_URL || API_URL.startsWith('PEGAR')){
+      s.classList.add('error'); t.textContent='Configure API_URL'; return;
+    }
+    const r = await fetch(API_URL, {method:'GET'});
+    if (r.ok){ s.classList.add('online'); t.textContent='Conectado'; }
+    else { s.classList.add('error'); t.textContent='Servidor con error'; }
+  } catch(e){
+    s.classList.add('error'); t.textContent='Sin conexión';
+  }
+}
+
+/* ============================================================ *
+ *  NAVEGACIÓN POR PASOS                                          *
+ * ============================================================ */
+function gotoStep(n){
+  for (let i=1;i<=4;i++){
+    const panel = document.getElementById('step-'+i);
+    if (panel) panel.classList.toggle('hidden', i!==n);
+    const step = document.querySelector(`.step[data-step="${i}"]`);
+    if (step){
+      step.classList.toggle('active', i===n);
+      step.classList.toggle('done',  i<n);
+    }
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ============================================================ *
+ *  TARJETA DE PACIENTE + RESUMEN PREVIO                          *
+ * ============================================================ */
+function renderPaciente(){
+  const card = document.getElementById('pacCard');
+  if (!state.paciente){ card.classList.remove('show'); return; }
+  card.classList.add('show');
+  document.getElementById('pacName').textContent = state.paciente['Nombre y Apellidos'] || '—';
+  const meta = [
+    `<span><strong>Doc:</strong> ${state.paciente['Documento']}</span>`,
+    state.paciente['Edad'] ? `<span><strong>Edad:</strong> ${state.paciente['Edad']} años</span>` : '',
+    state.paciente['Sexo'] ? `<span><strong>Sexo:</strong> ${state.paciente['Sexo']}</span>` : '',
+    state.paciente['Diagnóstico Principal'] ? `<span><strong>Dx ppal:</strong> ${state.paciente['Diagnóstico Principal']}</span>` : '',
+    state.paciente['Diagnóstico Secundario'] ? `<span><strong>Dx sec:</strong> ${state.paciente['Diagnóstico Secundario']}</span>` : '',
+    state.paciente['Total Visitas'] ? `<span><strong>Visitas previas:</strong> ${state.paciente['Total Visitas']}</span>` : ''
+  ].filter(Boolean).join('');
+  document.getElementById('pacMeta').innerHTML = meta;
+}
+
+async function cargarResumenPrevio(){
+  const box = document.getElementById('prevBox');
+  box.innerHTML = '';
+  if (!state.paciente) return;
+  try{
+    const h = await api('historialPaciente', {documento: state.paciente['Documento']});
+    if (!h.necpal.length && !h.esas.length){
+      box.innerHTML = `<div class="prev"><div class="prev-title">Primera evaluación registrada</div>
+        <div class="prev-row" style="color:var(--mute);font-style:italic">No hay evaluaciones previas para este paciente.</div></div>`;
+      return;
+    }
+    let html = `<div class="prev"><div class="prev-title">Última evaluación registrada</div>`;
+    if (h.necpal.length){
+      const last = h.necpal[0];
+      const cls = last['Resultado NECPAL']==='NECPAL POSITIVO' ? 'b-pos' : 'b-neg';
+      html += `<div class="prev-row"><strong>NECPAL · ${fmtFecha(last['Fecha y Hora'])}</strong>
+        <span class="badge ${cls}">${last['Resultado NECPAL']}</span>
+        <span>SQ: ${last['Pregunta Sorpresa'] || '—'} · Parámetros: ${last['Total Parámetros Positivos']}</span></div>`;
+    }
+    if (h.esas.length){
+      const last = h.esas[0];
+      const total = last['Carga Sintomática Total'];
+      const sev = last['Síntomas Severos (≥7)'];
+      const cls = sev>=2 ? 'b-pos' : (total>=20 ? 'b-mid' : 'b-neg');
+      html += `<div class="prev-row"><strong>ESAS · ${fmtFecha(last['Fecha y Hora'])}</strong>
+        <span class="badge ${cls}">Carga ${total} · ${sev} severos</span>
+        <span>Promedio: ${last['Promedio']}</span></div>`;
+    }
+    html += `<div class="prev-row"><a class="history-link" onclick="abrirHistorial()">Ver historial completo →</a></div>`;
+    html += `</div>`;
+    box.innerHTML = html;
+  } catch(e){
+    box.innerHTML = `<div class="prev"><div class="prev-title">Historial</div>
+      <div class="prev-row" style="color:var(--danger-text)">No se pudo cargar: ${e.message}</div></div>`;
+  }
+}
+
+function fmtFecha(s){
+  if (!s) return '—';
+  s = String(s).replace('T',' ').slice(0,16);
+  return s;
+}
+
+/* ============================================================ *
+ *  PASO 1: BUSCAR / REGISTRAR                                    *
+ * ============================================================ */
+document.getElementById('evaluador').addEventListener('change', e => {
+  state.evaluador = e.target.value;
+});
+
+document.getElementById('btnBuscar').addEventListener('click', async () => {
+  const doc = document.getElementById('docInput').value.replace(/\D/g,'').trim();
+  if (!doc){ toast('Ingrese un documento', 'error'); return; }
+  const btn = document.getElementById('btnBuscar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Buscando…';
+  try{
+    const p = await api('buscarPaciente', {documento: doc});
+    if (p){
+      state.paciente = p;
+      // Pre-cargar formulario para permitir actualizar datos
+      document.getElementById('nombre').value       = p['Nombre y Apellidos'] || '';
+      document.getElementById('edad').value         = p['Edad'] || '';
+      document.getElementById('sexo').value         = p['Sexo'] || '';
+      document.getElementById('dxPrincipal').value  = p['Diagnóstico Principal'] || '';
+      document.getElementById('dxSecundario').value = p['Diagnóstico Secundario'] || '';
+      document.getElementById('formTitle').textContent = 'Datos del paciente (puede actualizar)';
+      document.getElementById('formNuevo').classList.remove('hidden');
+      document.getElementById('btnIrNECPAL').disabled = false;
+      renderPaciente();
+      cargarResumenPrevio();
+      toast('Paciente encontrado', 'success');
+    } else {
+      state.paciente = null;
+      ['nombre','edad','sexo','dxPrincipal','dxSecundario'].forEach(id => document.getElementById(id).value='');
+      document.getElementById('formTitle').textContent = 'Nuevo registro';
+      document.getElementById('formNuevo').classList.remove('hidden');
+      document.getElementById('btnIrNECPAL').disabled = true;
+      renderPaciente();
+      toast('Paciente nuevo. Complete los datos.', 'success');
+    }
+  } catch(e){
+    toast(e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Buscar paciente';
+});
+
+document.getElementById('btnGuardarPac').addEventListener('click', async () => {
+  const documento = document.getElementById('docInput').value.replace(/\D/g,'').trim();
+  const nombre    = document.getElementById('nombre').value.trim();
+  if (!documento){ toast('Documento requerido', 'error'); return; }
+  if (!nombre){ toast('Nombre requerido', 'error'); return; }
+
+  const payload = {
+    documento,
+    nombre,
+    edad: document.getElementById('edad').value || '',
+    sexo: document.getElementById('sexo').value || '',
+    dxPrincipal: document.getElementById('dxPrincipal').value.trim(),
+    dxSecundario: document.getElementById('dxSecundario').value.trim()
+  };
+  const btn = document.getElementById('btnGuardarPac');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Guardando…';
+  try{
+    const action = state.paciente ? 'actualizarPaciente' : 'registrarPaciente';
+    const p = await api(action, {paciente: payload});
+    state.paciente = p;
+    renderPaciente();
+    cargarResumenPrevio();
+    toast(state.paciente ? 'Datos actualizados' : 'Paciente registrado', 'success');
+    document.getElementById('btnIrNECPAL').disabled = false;
+  } catch(e){
+    toast(e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Guardar y continuar';
+});
+
+document.getElementById('btnReiniciar').addEventListener('click', () => {
+  if (!confirm('¿Limpiar el formulario y empezar de cero?')) return;
+  reiniciarTodo();
+});
+
+document.getElementById('btnIrNECPAL').addEventListener('click', () => {
+  if (!state.paciente){ toast('Identifique primero al paciente', 'error'); return; }
+  state.evaluador = document.getElementById('evaluador').value;
+  gotoStep(2);
+});
+
+/* ============================================================ *
+ *  PASO 2: NECPAL                                                *
+ * ============================================================ */
+function renderNECPAL(){
+  const cont = document.getElementById('necpalBody');
+  cont.innerHTML = '';
+  NECPAL_ITEMS.forEach(it => {
+    if (it.section){
+      const s = document.createElement('div');
+      s.className = 'necpal-section';
+      s.textContent = it.section;
+      cont.appendChild(s);
+      return;
+    }
+    const row = document.createElement('div');
+    row.className = 'necpal-item';
+    row.innerHTML = `
+      <div class="necpal-text">${it.text}</div>
+      <div class="necpal-buttons">
+        <button class="btn-opt" data-id="${it.id}" data-val="si">Sí</button>
+        <button class="btn-opt" data-id="${it.id}" data-val="no">No</button>
+      </div>`;
+    cont.appendChild(row);
+  });
+  cont.querySelectorAll('.btn-opt').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.id, val = b.dataset.val;
+      state.necpal[id] = val;
+      cont.querySelectorAll(`.btn-opt[data-id="${id}"]`).forEach(x => {
+        x.classList.remove('sel-yes','sel-no');
+      });
+      b.classList.add(val==='si' ? 'sel-yes' : 'sel-no');
+      computeNECPAL();
+    });
+  });
+}
+
+function computeNECPAL(){
+  const sq = state.necpal.sq;
+  const params = ['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10'];
+  const pos = params.filter(k => state.necpal[k]==='si').length;
+  const sqTxt = sq==='no' ? 'No' : (sq==='si' ? 'Sí' : '—');
+  document.getElementById('necpalNum').textContent = `SQ: ${sqTxt} · Parámetros: ${pos}`;
+  const v = document.getElementById('necpalVerdict');
+  if (!sq){ v.style.display='none'; return; }
+  v.style.display = 'inline-block';
+  v.classList.remove('v-pos','v-neg','v-mid','v-info');
+  if (sq==='no' && pos>=1){
+    v.textContent = 'NECPAL + · necesidades paliativas';
+    v.classList.add('v-pos');
+  } else if (sq==='no'){
+    v.textContent = 'SQ positiva sin parámetros adicionales';
+    v.classList.add('v-mid');
+  } else {
+    v.textContent = 'NECPAL − · pronóstico no limitado';
+    v.classList.add('v-neg');
+  }
+}
+
+document.getElementById('btnIrESAS').addEventListener('click', () => {
+  if (!state.necpal.sq){ toast('Responda al menos la pregunta sorpresa', 'error'); return; }
+  state.necpal.obs = document.getElementById('necpalObs').value;
+  gotoStep(3);
+});
+
+/* ============================================================ *
+ *  PASO 3: ESAS                                                  *
+ * ============================================================ */
+function renderESAS(){
+  const cont = document.getElementById('esasBody');
+  cont.innerHTML = '';
+  ESAS_ITEMS.forEach(it => {
+    state.esas[it.id] = state.esas[it.id] != null ? state.esas[it.id] : 0;
+    const row = document.createElement('div');
+    row.className = 'esas-item';
+    row.innerHTML = `
+      <div class="esas-row">
+        <div class="esas-name">${it.label}</div>
+        <div class="esas-anchors">${it.anchors}</div>
+        <div class="esas-value" id="v-${it.id}">0</div>
+      </div>
+      <input type="range" class="esas-slider" min="0" max="10" step="1" value="${state.esas[it.id]}" data-id="${it.id}">
+      <div class="esas-scale"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>`;
+    cont.appendChild(row);
+  });
+
+  // Síntoma personalizado
+  const row = document.createElement('div');
+  row.className = 'esas-item';
+  row.innerHTML = `
+    <div class="esas-row">
+      <div style="flex:1">
+        <input type="text" id="esasOtroNombre" placeholder="Otro síntoma (opcional)" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit">
+      </div>
+      <div class="esas-value" id="v-otro">—</div>
+    </div>
+    <input type="range" class="esas-slider" min="0" max="10" step="1" value="0" data-id="otro" disabled>
+    <div class="esas-scale"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>`;
+  cont.appendChild(row);
+
+  // Listeners
+  cont.querySelectorAll('.esas-slider').forEach(sl => {
+    sl.addEventListener('input', () => {
+      const id = sl.dataset.id;
+      const val = Number(sl.value);
+      state.esas[id] = val;
+      const lbl = document.getElementById('v-'+id);
+      lbl.textContent = val;
+      lbl.classList.remove('mild','moderate','severe');
+      if (val>=7) lbl.classList.add('severe');
+      else if (val>=4) lbl.classList.add('moderate');
+      else if (val>=1) lbl.classList.add('mild');
+      computeESAS();
+    });
+  });
+  document.getElementById('esasOtroNombre').addEventListener('input', e => {
+    const sl = cont.querySelector('.esas-slider[data-id="otro"]');
+    const lbl = document.getElementById('v-otro');
+    if (e.target.value.trim()){
+      sl.disabled = false;
+      state.esas.otroNombre = e.target.value.trim();
+      lbl.textContent = state.esas.otro || 0;
+      if (!state.esas.otro) state.esas.otro = 0;
+    } else {
+      sl.disabled = true;
+      sl.value = 0;
+      state.esas.otroNombre = '';
+      state.esas.otro = '';
+      lbl.textContent = '—';
+    }
+    computeESAS();
+  });
+  computeESAS();
+}
+
+function computeESAS(){
+  const keys = ESAS_ITEMS.map(i => i.id);
+  const vals = keys.map(k => Number(state.esas[k]) || 0);
+  let total = vals.reduce((a,b) => a+b, 0);
+  let conteo = vals.length;
+  let sev = vals.filter(v => v>=7).length;
+  if (state.esas.otroNombre && state.esas.otro !== '' && state.esas.otro != null){
+    const o = Number(state.esas.otro) || 0;
+    total += o; conteo++;
+    if (o>=7) sev++;
+  }
+  document.getElementById('esasTotal').textContent = total;
+  document.getElementById('esasProm').textContent  = conteo>0 ? (total/conteo).toFixed(1) : '0.0';
+  document.getElementById('esasSev').textContent   = sev;
+}
+
+document.getElementById('btnGuardarVisita').addEventListener('click', async () => {
+  state.esas.obs = document.getElementById('esasObs').value;
+  const btn = document.getElementById('btnGuardarVisita');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>Guardando…';
+  try{
+    const v = await api('guardarVisita', {
+      visita: {
+        documento: state.paciente['Documento'],
+        evaluador: state.evaluador,
+        necpal: state.necpal,
+        esas: state.esas
+      }
+    });
+    state.ultimaVisita = v;
+    renderResumen();
+    gotoStep(4);
+    toast('Evaluación guardada correctamente', 'success');
+  } catch(e){
+    toast(e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Guardar evaluación completa';
+});
+
+/* ============================================================ *
+ *  PASO 4: RESUMEN                                               *
+ * ============================================================ */
+function renderResumen(){
+  const params = ['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10'];
+  const pos = params.filter(k => state.necpal[k]==='si').length;
+  const sq = state.necpal.sq;
+  const necpalRes = (sq==='no' && pos>=1) ? 'NECPAL POSITIVO' : (sq ? 'NECPAL NEGATIVO' : 'Indeterminado');
+  const necpalCls = necpalRes==='NECPAL POSITIVO' ? 'v-pos' : 'v-neg';
+
+  const keys = ESAS_ITEMS.map(i => i.id);
+  const vals = keys.map(k => Number(state.esas[k]) || 0);
+  let total = vals.reduce((a,b) => a+b, 0);
+  let conteo = vals.length;
+  let sev = vals.filter(v => v>=7).length;
+  if (state.esas.otroNombre && state.esas.otro){
+    total += Number(state.esas.otro);
+    conteo++;
+    if (Number(state.esas.otro)>=7) sev++;
+  }
+
+  const html = `
+    <div style="margin-bottom:14px">
+      <div class="necpal-section">Datos de la visita</div>
+      <div class="prev-row"><strong>ID:</strong> ${state.ultimaVisita.idVisita}</div>
+      <div class="prev-row"><strong>Fecha y hora:</strong> ${state.ultimaVisita.fechaHora}</div>
+      <div class="prev-row"><strong>Evaluador:</strong> ${state.evaluador}</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="necpal-section">NECPAL CCOMS-ICO 4.0</div>
+      <div class="prev-row">
+        <span>SQ: <strong>${sq==='no'?'No':'Sí'}</strong> · Parámetros positivos: <strong>${pos}/10</strong></span>
+        <span class="badge ${necpalCls}">${necpalRes}</span>
+      </div>
+    </div>
+    <div>
+      <div class="necpal-section">ESAS-r</div>
+      <div class="prev-row">
+        <span>Carga total: <strong>${total}</strong></span>
+        <span>Promedio: <strong>${conteo>0?(total/conteo).toFixed(1):'0.0'}</strong></span>
+        <span>Síntomas severos (≥7): <strong>${sev}</strong></span>
+      </div>
+    </div>`;
+  document.getElementById('summaryBody').innerHTML = html;
+}
+
+document.getElementById('btnNueva').addEventListener('click', () => reiniciarTodo());
+document.getElementById('btnHistorial').addEventListener('click', () => abrirHistorial());
+
+/* ============================================================ *
+ *  HISTORIAL COMPLETO                                            *
+ * ============================================================ */
+async function abrirHistorial(){
+  if (!state.paciente){ toast('Cargue primero un paciente', 'error'); return; }
+  document.getElementById('modalHist').classList.add('show');
+  const body = document.getElementById('histBody');
+  body.innerHTML = '<div style="text-align:center;color:var(--mute);padding:20px"><span class="loader" style="border-color:rgba(108,99,183,.3);border-top-color:var(--primary)"></span> Cargando…</div>';
+  try{
+    const h = await api('historialPaciente', {documento: state.paciente['Documento']});
+    if (!h.visitas.length){
+      body.innerHTML = '<div style="color:var(--mute);font-style:italic;text-align:center;padding:20px">Sin evaluaciones previas registradas.</div>';
+      return;
+    }
+    let html = `<div style="font-size:12px;color:var(--ink-soft);margin-bottom:10px"><strong>${h.visitas.length}</strong> visita(s) registrada(s) — más recientes primero.</div>`;
+    h.visitas.forEach(v => {
+      const necpal = h.necpal.find(n => n['ID Visita']===v['ID Visita']);
+      const esas   = h.esas.find(e => e['ID Visita']===v['ID Visita']);
+      let nec = '';
+      if (necpal){
+        const cls = necpal['Resultado NECPAL']==='NECPAL POSITIVO' ? 'b-pos' : 'b-neg';
+        nec = `<div class="h-row"><strong>NECPAL:</strong> <span class="badge ${cls}">${necpal['Resultado NECPAL']}</span> <span>SQ: ${necpal['Pregunta Sorpresa'] || '—'} · Parámetros: ${necpal['Total Parámetros Positivos']}</span></div>`;
+      }
+      let es = '';
+      if (esas){
+        const sev = esas['Síntomas Severos (≥7)'];
+        const tot = esas['Carga Sintomática Total'];
+        const cls = sev>=2 ? 'b-pos' : (tot>=20 ? 'b-mid' : 'b-neg');
+        es = `<div class="h-row"><strong>ESAS:</strong> <span class="badge ${cls}">Carga ${tot} · ${sev} severos</span> <span>Promedio: ${esas['Promedio']}</span></div>`;
+      }
+      html += `<div class="history-item">
+        <div class="h-date">${fmtFecha(v['Fecha y Hora'])} · ${v['Evaluador']}</div>
+        ${nec}${es}
+      </div>`;
+    });
+    body.innerHTML = html;
+  } catch(e){
+    body.innerHTML = `<div style="color:var(--danger-text)">Error: ${e.message}</div>`;
+  }
+}
+
+function cerrarModal(){
+  document.getElementById('modalHist').classList.remove('show');
+}
+document.getElementById('modalHist').addEventListener('click', e => {
+  if (e.target.id==='modalHist') cerrarModal();
+});
+
+/* ============================================================ *
+ *  NAVEGACIÓN                                                    *
+ * ============================================================ */
+document.querySelectorAll('[data-back]').forEach(b => {
+  b.addEventListener('click', () => gotoStep(Number(b.dataset.back)));
+});
+
+document.querySelectorAll('.step').forEach(st => {
+  st.addEventListener('click', () => {
+    const n = Number(st.dataset.step);
+    if (n===1 || (n===2 && state.paciente) || (n>=3 && state.paciente && state.necpal.sq) || (n===4 && state.ultimaVisita)){
+      if (n===2 && !document.getElementById('necpalBody').children.length) renderNECPAL();
+      if (n===3 && !document.getElementById('esasBody').children.length) renderESAS();
+      gotoStep(n);
+    }
+  });
+});
+
+document.getElementById('btnIrNECPAL').addEventListener('click', () => {
+  if (!document.getElementById('necpalBody').children.length) renderNECPAL();
+});
+document.getElementById('btnIrESAS').addEventListener('click', () => {
+  if (!document.getElementById('esasBody').children.length) renderESAS();
+});
+
+/* ============================================================ *
+ *  TOAST + REINICIO                                              *
+ * ============================================================ */
+let toastTimer;
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function reiniciarTodo(){
+  state.paciente = null;
+  state.necpal = {};
+  state.esas = {};
+  state.ultimaVisita = null;
+  document.getElementById('docInput').value = '';
+  ['nombre','edad','sexo','dxPrincipal','dxSecundario','necpalObs','esasObs'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('formNuevo').classList.add('hidden');
+  document.getElementById('btnIrNECPAL').disabled = true;
+  document.getElementById('necpalBody').innerHTML = '';
+  document.getElementById('esasBody').innerHTML = '';
+  document.getElementById('necpalNum').textContent = 'SQ: — · Parámetros: 0';
+  document.getElementById('necpalVerdict').style.display = 'none';
+  document.getElementById('pacCard').classList.remove('show');
+  gotoStep(1);
+}
+
+/* ============================================================ *
+ *  ARRANQUE                                                      *
+ *  Nota: checkConnection() se invoca tras desbloquear con clave  *
+ * ============================================================ */
+</script>
+</body>
+</html>

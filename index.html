@@ -196,6 +196,10 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:v
 /* Footer credit */
 .credit{text-align:center;font-size:11px;color:var(--mute);font-style:italic;margin-top:30px;padding:0 16px;line-height:1.5}
 .credit strong{color:var(--ink-soft);font-style:normal}
+.flag-co{display:inline-block;width:18px;height:13px;margin-left:4px;vertical-align:-2px;border-radius:2px;overflow:hidden;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.flag-co .flag-y{display:block;width:100%;height:50%;background:#FCD116}
+.flag-co .flag-b{display:block;width:100%;height:25%;background:#003893}
+.flag-co .flag-r{display:block;width:100%;height:25%;background:#CE1126}
 
 /* Hidden helper */
 .hidden{display:none !important}
@@ -292,7 +296,10 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:v
     <button id="lockBtn" class="lock-btn">Ingresar</button>
     <div class="lock-foot">
       <strong>Sistema de Registro Paliativo</strong><br>
-      Dr. Jorge Bogoya · Universidad Antonio Nariño 🇨🇴
+      Dr. Jorge Bogoya · Universidad Antonio Nariño
+      <span class="flag-co" aria-label="Colombia" title="Colombia">
+        <span class="flag-y"></span><span class="flag-b"></span><span class="flag-r"></span>
+      </span>
     </div>
   </div>
 </div>
@@ -487,7 +494,10 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:v
 <!-- Footer -->
 <div class="credit">
   Elaborado por <strong>Jorge Bogoya López</strong>, docente de la Maestría en Investigación en Cuidados Paliativos<br>
-  Universidad Antonio Nariño · Colombia 🇨🇴
+  Universidad Antonio Nariño · Colombia
+  <span class="flag-co" aria-label="Colombia" title="Colombia">
+    <span class="flag-y"></span><span class="flag-b"></span><span class="flag-r"></span>
+  </span>
 </div>
 
 </div><!-- /app -->
@@ -690,6 +700,7 @@ const ESAS_ITEMS = [
 const state = {
   evaluador:'auto-registro',
   paciente:null,
+  esLegacy:false,
   necpal:{},
   esas:{},
   ultimaVisita:null
@@ -702,32 +713,46 @@ async function api(action, payload = {}) {
   if (!API_URL || API_URL.startsWith('PEGAR')) {
     throw new Error('Configure la constante API_URL con la URL del Apps Script desplegado.');
   }
-  const body = JSON.stringify(Object.assign({action}, payload));
-  // Apps Script Web Apps require text/plain to avoid CORS preflight
-  const res = await fetch(API_URL, {
-    method:'POST',
-    body,
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    redirect:'follow'
-  });
-  if (!res.ok) throw new Error('Error de red: ' + res.status);
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'Error desconocido');
-  return json.data;
+  const json = JSON.stringify(Object.assign({action}, payload));
+  // Usar application/x-www-form-urlencoded para evitar CORS preflight
+  // y enviar el JSON como un único parámetro 'payload'
+  const body = 'payload=' + encodeURIComponent(json);
+  let res;
+  try {
+    res = await fetch(API_URL, {
+      method: 'POST',
+      body,
+      headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'},
+      redirect: 'follow'
+    });
+  } catch (netErr) {
+    throw new Error('No se pudo conectar al servidor. Verifique conexión a internet o el despliegue del Apps Script.');
+  }
+  if (!res.ok) throw new Error('Error HTTP ' + res.status + ' del servidor.');
+  let data;
+  try {
+    data = await res.json();
+  } catch (parseErr) {
+    throw new Error('Respuesta inválida del servidor (no es JSON).');
+  }
+  if (!data.ok) throw new Error(data.error || 'Error desconocido en el servidor.');
+  return data.data;
 }
 
 async function checkConnection(){
   const s = document.getElementById('status');
   const t = document.getElementById('status-txt');
+  s.classList.remove('online','error');
   try{
     if (!API_URL || API_URL.startsWith('PEGAR')){
       s.classList.add('error'); t.textContent='Configure API_URL'; return;
     }
-    const r = await fetch(API_URL, {method:'GET'});
-    if (r.ok){ s.classList.add('online'); t.textContent='Conectado'; }
-    else { s.classList.add('error'); t.textContent='Servidor con error'; }
+    // Probar con la propia API en lugar de un GET simple
+    await api('ping');
+    s.classList.add('online'); t.textContent='Conectado';
   } catch(e){
-    s.classList.add('error'); t.textContent='Sin conexión';
+    s.classList.add('error');
+    t.textContent = 'Sin conexión: ' + e.message;
   }
 }
 
@@ -824,9 +849,10 @@ document.getElementById('btnBuscar').addEventListener('click', async () => {
   btn.innerHTML = '<span class="loader"></span>Buscando…';
   try{
     const p = await api('buscarPaciente', {documento: doc});
-    if (p){
+    if (p && p._fuente === 'pacientes'){
+      // Paciente con registro completo en hoja Pacientes
       state.paciente = p;
-      // Pre-cargar formulario para permitir actualizar datos
+      state.esLegacy = false;
       document.getElementById('nombre').value       = p['Nombre y Apellidos'] || '';
       document.getElementById('edad').value         = p['Edad'] || '';
       document.getElementById('sexo').value         = p['Sexo'] || '';
@@ -837,9 +863,25 @@ document.getElementById('btnBuscar').addEventListener('click', async () => {
       document.getElementById('btnIrNECPAL').disabled = false;
       renderPaciente();
       cargarResumenPrevio();
-      toast('Paciente encontrado', 'success');
+      toast('Paciente encontrado en registro completo', 'success');
+    } else if (p && p._fuente === 'baseDatos'){
+      // Paciente en hoja legacy BaseDatos: tiene doc+nombre, falta el resto
+      state.paciente = null;        // NO está completo aún
+      state.esLegacy = true;
+      document.getElementById('nombre').value       = p['Nombre y Apellidos'] || '';
+      document.getElementById('edad').value         = '';
+      document.getElementById('sexo').value         = '';
+      document.getElementById('dxPrincipal').value  = '';
+      document.getElementById('dxSecundario').value = '';
+      document.getElementById('formTitle').textContent = 'Paciente encontrado en base previa — complete los datos clínicos';
+      document.getElementById('formNuevo').classList.remove('hidden');
+      document.getElementById('btnIrNECPAL').disabled = true;
+      renderPaciente();
+      toast('Encontrado en base previa. Complete edad, sexo y diagnósticos.', 'success');
     } else {
+      // Paciente nuevo
       state.paciente = null;
+      state.esLegacy = false;
       ['nombre','edad','sexo','dxPrincipal','dxSecundario'].forEach(id => document.getElementById(id).value='');
       document.getElementById('formTitle').textContent = 'Nuevo registro';
       document.getElementById('formNuevo').classList.remove('hidden');
@@ -872,12 +914,18 @@ document.getElementById('btnGuardarPac').addEventListener('click', async () => {
   btn.disabled = true;
   btn.innerHTML = '<span class="loader"></span>Guardando…';
   try{
-    const action = state.paciente ? 'actualizarPaciente' : 'registrarPaciente';
+    // Si ya está en Pacientes (no legacy) -> actualizar; si es nuevo o legacy -> registrar
+    const action = (state.paciente && !state.esLegacy) ? 'actualizarPaciente' : 'registrarPaciente';
     const p = await api(action, {paciente: payload});
     state.paciente = p;
+    state.esLegacy = false;
     renderPaciente();
     cargarResumenPrevio();
-    toast(state.paciente ? 'Datos actualizados' : 'Paciente registrado', 'success');
+    if (p && p._migrado){
+      toast('Paciente migrado de la base previa con datos completos', 'success');
+    } else {
+      toast(action === 'actualizarPaciente' ? 'Datos actualizados' : 'Paciente registrado', 'success');
+    }
     document.getElementById('btnIrNECPAL').disabled = false;
   } catch(e){
     toast(e.message, 'error');

@@ -44,20 +44,6 @@ Calculadora de Dosis Equivalente de Morfina Oral (DEMO):
 
 ---
 
-## 🚀 Cómo usar las herramientas
-
-**Opción 1 — Online (más fácil):**
-Haz clic en los enlaces de la tabla de arriba.
-
-**Opción 2 — Descargar y usar sin internet:**
-1. Haz clic en el botón verde **« Code »** arriba a la derecha.
-2. Selecciona **« Download ZIP »**.
-3. Descomprime y abre cualquier archivo `.html` con doble clic.
-
-No requiere instalación, ni servidor, ni conexión permanente a internet.
-
----
-
 ## ⚠️ Advertencias clínicas importantes
 
 > **Estas herramientas son EDUCATIVAS.** No reemplazan el juicio clínico ni las guías institucionales.
@@ -75,7 +61,6 @@ Ambas herramientas se alinean con la **Ley 1733 de 2014** (derecho a cuidados pa
 ## 🤝 Contribuciones y contacto
 
 **Dr. Jorge Bogoya**
-Maestría en Cuidados Paliativos · Universidad Antonio Nariño
 Hospital Regional de Moniquirá E.S.E. · Boyacá, Colombia
 
 Para reportar errores clínicos, sugerencias o colaboraciones, por favor abre un **Issue** en este repositorio.
